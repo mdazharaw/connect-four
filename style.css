@@ -1,0 +1,33 @@
+*{
+font-family: 'Righteous', cursive;}
+h1{
+    font-size: 50px;
+}
+::selection {
+    color: none;
+    background: none;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    background-color: mediumturquoise;
+}
+button{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    
+}
+.buttons{
+  display: flex;
+  justify-content: space-evenly;  
+}
+.container{
+  max-width: 960px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+}
