@@ -11,13 +11,14 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <h1 id="gameTitle">Connect <span id="easterEgg">Four</span></h1>
-        <div class="buttons" id="buttonDiv">
+        <div class="blinking "id="toStart">Press anything to start...</div>
+        <div class="buttons" id="buttonDiv" style="display: none">
             <button id="singlePlayer">Single Player</button>
             <button id="multiPlayer">Multiplayer</button>
         </div>
-
+        <div id="gameBoard">&nbsp;</div>
     </div>
 
     <script src="script.js"></script>
