@@ -8,19 +8,38 @@
     <link rel="icon" href="images/icon.ico">
     <link rel="stylesheet" type="text/css" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Righteous&display=swap" rel="stylesheet">
-
+    <style id="gridStyle">
+        #gameBoard {
+            grid-template-columns: auto auto auto auto auto auto;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container" id="container">
         <h1 id="gameTitle">Connect <span id="easterEgg" title="Click me!">4</span></h1>
-        <div class="blinking "id="toStart">Press anything to start...</div>
-        <div class="buttons" id="buttonDiv" style="display: none">
-            <button id="singlePlayer">Single Player</button>
-            <button id="multiPlayer">Multiplayer</button>
+        <div class="blinking " id="toStart">Press anything to start...</div>
+        <div id="options">
+            <h4 id="sizeSelector" style="display: none">Board Size:&nbsp;&nbsp; <span>
+                    <select name="sizeOptions" id="sizeOptions" onchange="getSize(this.value)">
+                        <option value="6">Choose a size...</option>
+                        <option value="6">6 x 6</option>
+                        <option value="7">7 x 7</option>
+                        <option value="8">8 x 8</option>
+
+
+                    </select>
+                </span></h4>
+
+            <div class="buttons" id="buttonDiv" style="display: none">
+                <button id="singlePlayer">Single Player</button>
+                <button id="multiPlayer">Multiplayer</button>
+            </div>
+
         </div>
-        <div id = "functionals"></div>
-        <div id="gameBoard" style="display: none"> 
+
+        <div id="functionals"></div>
+        <div id="gameBoard" style="display: none">
         </div>
     </div>
 

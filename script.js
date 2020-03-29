@@ -5,7 +5,6 @@ var click = 4;
 var hoverSound = new sound("audio/hover.mp3");
 var clickSound = new sound("audio/click.mp3");
 var boardArray = [];
-hideButtons();
 document.addEventListener("click", start);
 document.addEventListener("keypress", start);
 var turn = 1;
@@ -15,11 +14,16 @@ var colour = "red";
 var startTimer = false;
 var gameOver = false;
 var winner = "";
+var boardSize = 6; // default board size
+
+//Starting Actions
+hideOptions();
+setInterval(updateTimer, 1000);
 
 singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
     clickSound.play();
     console.log("Single Player Mode Selected");
-    hideButtons();
+    hideOptions();
     showFunctions();
     drawBoard();
     document.getElementById("gameBoard").style.display = "grid";
@@ -28,7 +32,7 @@ singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
 multiPlayerBtn.addEventListener("click", function multiButtonPress(event) {
     clickSound.play();
     console.log("Multiplayer Mode Selected");
-    hideButtons();
+    hideOptions();
     showFunctions();
     drawBoard();
     document.getElementById("gameBoard").style.display = "grid";
@@ -61,14 +65,18 @@ function removeElement(elementId) {
     element.parentNode.removeChild(element);
 }
 
-function hideButtons() {
+function hideOptions() {
     var buttonDiv = document.getElementById("buttonDiv");
     buttonDiv.style.display = "none";
+    var sizeSelector = document.getElementById("sizeSelector");
+    sizeSelector.style.display = "none";
 }
 
-function showButtons() {
+function showOptions() {
     document.removeEventListener("click", start);
     document.removeEventListener("keypress", start);
+    var sizeSelector = document.getElementById("sizeSelector");
+    sizeSelector.style.display = "flex";
     var buttonDiv = document.getElementById("buttonDiv");
     buttonDiv.style.display = "flex";
 }
@@ -76,7 +84,7 @@ function showButtons() {
 function start() {
     clickSound.play();
     removeElement("toStart");
-    showButtons();
+    showOptions();
 }
 
 function showFunctions() {
@@ -117,6 +125,24 @@ function showFunctions() {
     }, 500);
 
 }
+function getSize(input) {
+    var temp = parseInt(input);
+    if (temp != NaN) {
+        boardSize = temp;
+        console.log(`Board size set to ${boardSize}`);
+    }
+
+    var style = document.getElementById('gridStyle');
+    var autoTemplate = "";
+    for (i = 0; i < boardSize; i++) {
+        autoTemplate += " auto"
+    }
+    style.innerHTML = `
+  #gameBoard {
+  grid-template-columns:${autoTemplate};
+  }`;
+
+}
 
 function drawBoard() {
     var gameBoard = document.getElementById("gameBoard");
@@ -124,16 +150,16 @@ function drawBoard() {
     var id = "";
     var row = 0;
     var col = 0;
-    while (i <= 49) {
+    while (i <= (boardSize * boardSize)) {
         id = row.toString().concat(col.toString());
         var tile = createTile(id);
         gameBoard.appendChild(tile);
         i++;
         col++;
-        if (col == 7) {
+        if (col == boardSize) {
             col = 0;
             row++;
-            var rowArr = [null, null, null, null, null, null, null];
+            var rowArr = new Array(boardSize).fill(null);
             boardArray.push(rowArr);
         }
 
@@ -152,7 +178,7 @@ function createTile(id) {
         hoverSound.play();
         drop(this.id);
         swapTurn();
-        
+
     }
     disc.onmouseover = function () {
         // console.log(this.id);
@@ -228,24 +254,24 @@ function getLastInColumn(id) {
     var column = id.substr(1, 1);
     var colArr = [];
     var lastNonFilledElement;
-  
-    
+
+
     var htmlTileArr = document.getElementsByClassName("disc");
-    console.log(htmlTileArr);
+    // console.log(htmlTileArr);
     for (i = 0; i < htmlTileArr.length; i++) {
         var doc = htmlTileArr[i];
         var docId = doc.id;
-        var colId = docId.substr(1,1);
-        if (colId == column){
-            if(doc.classList.contains("empty")){
+        var colId = docId.substr(1, 1);
+        if (colId == column) {
+            if (doc.classList.contains("empty")) {
                 colArr.push(doc);
             }
-            
+
         }
     }
-    lastNonFilledElement = colArr[colArr.length-1];
+    lastNonFilledElement = colArr[colArr.length - 1];
     return lastNonFilledElement;
-    };
+};
 
 function updateTimer() {
     if (startTimer) {
@@ -265,7 +291,6 @@ function resetTimer() {
     var timer = document.getElementById("timer");
     timer.innerText = 20;
 }
-setInterval(updateTimer, 1000);
 function sound(src) {
     this.sound = document.createElement("audio");
     this.sound.src = src;
