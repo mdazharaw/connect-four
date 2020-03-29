@@ -77,21 +77,38 @@ function turnIndicator() {
 
 function drawBoard(){
     var gameBoard = document.getElementById("gameBoard");
-    i = 0;
-    while (i<49){
-        var tile = document.createElement("div");
-        tile.className = "tile";
-        var disc = document.createElement("div");
-        disc.className = "disc";
-        disc.id = i;
-        disc.onclick = function () {
-            hoverSound.play();
-        }
-        tile.appendChild(disc);
+    var i = 1;
+    var id = ""; 
+    var row = 0;
+    var col = 0;
+    while (i<=49){
+        id = row.toString().concat(col.toString());
+        var tile = createTile(id);
         gameBoard.appendChild(tile);
-        i++ ;
+        i++;
+        col++;
+        if(col==7){
+            col = 0;
+            row ++;
+            var rowArr = [null,null,null,null,null,null,null];
+            boardArray.push(rowArr);
+        }
+       
     }
     
+}
+
+function createTile(id){
+    var tile = document.createElement("div");
+    tile.className = "tile";
+    var disc = document.createElement("div");
+    disc.className = "disc";
+    disc.id = id;
+    disc.onclick = function () {
+        hoverSound.play();
+    }
+    tile.appendChild(disc);
+    return tile;
 }
 
 function sound(src) {
