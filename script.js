@@ -12,24 +12,22 @@ var turn = 1;
 var firstPlayer = "🔴";
 var secondPlayer = "🟡";
 var colour = "red";
-
-
-
+var startTimer = false;
 
 singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
     clickSound.play();
     console.log("Single Player Mode Selected");
     hideButtons();
-    turnIndicator();
+    showFunctions();
     drawBoard();
     document.getElementById("gameBoard").style.display = "grid";
-})
 
+})
 multiPlayerBtn.addEventListener("click", function multiButtonPress(event) {
     clickSound.play();
     console.log("Multiplayer Mode Selected");
     hideButtons();
-    turnIndicator();
+    showFunctions();
     drawBoard();
     document.getElementById("gameBoard").style.display = "grid";
 })
@@ -79,15 +77,43 @@ function start() {
     showButtons();
 }
 
-function turnIndicator() {
+function showFunctions() {
+
+    var restart = document.createElement("h2");
+    restart.style.marginTop = "0px";
+    restart.style.marginBottom = "20px";
+    restart.innerHTML = "🔄";
+    restart.style.color = "black";
+    restart.id = "restart";
+    restart.onclick = function () {
+        location.reload();
+    };
+    document.getElementById("functionals").appendChild(restart);
+
+
     var turnIndicator = document.createElement("h2");
-    turnIndicator.display = "block";
-    turnIndicator.style.marginTop = "10px";
-    turnIndicator.style.marginBottom = "10px";
+    turnIndicator.style.marginTop = "0px";
+    turnIndicator.style.marginBottom = "20px";
     turnIndicator.innerHTML = "Red goes first";
     turnIndicator.style.color = "red";
     turnIndicator.id = "turnIndicator";
-    document.getElementById("container").insertBefore(turnIndicator, document.getElementById("gameBoard"));
+    document.getElementById("functionals").appendChild(turnIndicator);
+
+    var timerBox = document.createElement("div")
+    timerBox.style.width = "35px";
+    var timer = document.createElement("h2");
+    timer.style.marginTop = "0px";
+    timer.style.marginBottom = "20px";
+    timer.innerText = 20;
+    timer.style.color = "black";
+    timer.id = "timer";
+    timerBox.appendChild(timer);
+    document.getElementById("functionals").appendChild(timerBox);
+
+    setTimeout(function () {
+        startTimer = true;
+    }, 500);
+
 }
 
 function drawBoard() {
@@ -130,7 +156,7 @@ function createTile(id) {
     }
     disc.onmouseover = function () {
         // console.log(this.id);
-    highlight(this.id);
+        highlight(this.id);
     }
     disc.onmouseleave = function () {
         // console.log(this.id);
@@ -140,17 +166,17 @@ function createTile(id) {
     return tile;
 }
 
-function mapTile(id,value) {
+function mapTile(id, value) {
     var split1 = parseInt(id.substr(0, 1));
     var split2 = parseInt(id.substr(1, 1));
     boardArray[split1][split2] = value;
 }
 
-function swapTurn(){
+function swapTurn() {
     var turnId = document.getElementById("turnIndicator");
-    if (turn%2==1){
+    if (turn % 2 == 1) {
         turnId.style.color = "yellow";
-        turnId.innerText="Yellow's Turn";
+        turnId.innerText = "Yellow's Turn";
         colour = "yellow";
 
     } else if (turn % 2 == 0) {
@@ -159,11 +185,13 @@ function swapTurn(){
         colour = "red";
     }
     turn++;
+    resetTimer();
+
 }
 
-function changeColour(id){
+function changeColour(id) {
     var disc = document.getElementById(id);
-    if (colour == "yellow"){
+    if (colour == "yellow") {
         disc.style.backgroundColor = "yellow";
         mapTile(id, "🟡");
 
@@ -187,26 +215,43 @@ function dehighlight(id) {
     disc.style.backgroundColor = "rgb(190, 204, 204";
 }
 
-function drop(id){
+function drop(id) {
     var tileArr = document.getElementsByName("0")
 }
-function getColumn(id){
-    var column = id.substr(1,1);
+function getColumn(id) {
+    var column = id.substr(1, 1);
     var tileArr = document.getElementsByClassName("disc");
     tileArr = Array.from(tileArr);
     var colArr = [];
     for (disc in tileArr) {
         var discId = disc.id;
-        if (discId.substr(1,1) == column){
+        if (discId.substr(1, 1) == column) {
             colArr.push(disc);
         }
         console.log(colArr[colArr.lastIndexOf]);
         return (colArr[colArr.lastIndexOf]);
-    
+
     };
-
-
 }
+function updateTimer() {
+    if (startTimer) {
+        var timer = document.getElementById("timer");
+        var time = parseInt(timer.innerText);
+        if (time > 0) {
+            time -= 1;
+            timer.innerText = time;
+        } else if (time == 0) {
+            swapTurn();
+
+        }
+    }
+};
+
+function resetTimer() {
+    var timer = document.getElementById("timer");
+    timer.innerText = 20;
+}
+setInterval(updateTimer, 1000);
 function sound(src) {
     this.sound = document.createElement("audio");
     this.sound.src = src;

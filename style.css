@@ -1,8 +1,10 @@
 *{
-font-family: 'Righteous', cursive;}
+font-family: 'Righteous', cursive;
+cursor: pointer;}
 h1{
     font-size: 50px;
     margin: 10px;
+    margin-top: 5px;
 }
 ::selection {
     color: none;
@@ -38,11 +40,16 @@ button:hover
 {
     background-color: bisque;
 }
-
+#gameTitle:hover
+{
+   color: red;
+  -webkit-text-stroke-width: 0.8px;
+  -webkit-text-stroke-color: black;
+}
 #easterEgg:hover
 {
-  color: goldenrod;
-  -webkit-text-stroke-width: 1px;
+   color: yellow;
+  -webkit-text-stroke-width: 0.8px;
   -webkit-text-stroke-color: black;
 }
 .buttons{
@@ -86,4 +93,13 @@ button:hover
 {  
   -webkit-text-stroke-width: 0.3px;
   -webkit-text-stroke-color: black;
+}
+#functionals{
+display: flex;
+flex-direction: row;
+justify-content: space-between;  
+}
+
+#restart:hover
+{background-color: bisque;
 }
