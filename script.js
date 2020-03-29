@@ -13,6 +13,8 @@ var firstPlayer = "🔴";
 var secondPlayer = "🟡";
 var colour = "red";
 var startTimer = false;
+var gameOver = false;
+var winner = "";
 
 singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
     clickSound.play();
@@ -143,16 +145,14 @@ function createTile(id) {
     var tile = document.createElement("div");
     tile.className = "tile";
     var disc = document.createElement("div");
-    disc.className = "disc";
+    disc.className = "disc empty";
     disc.id = id;
     disc.onclick = function () {
         // console.log(this.id);
         hoverSound.play();
-        changeColour(this.id);
+        drop(this.id);
         swapTurn();
-        this.onclick = false;
-        this.onmouseover = false;
-        this.onmouseleave = false;
+        
     }
     disc.onmouseover = function () {
         // console.log(this.id);
@@ -202,7 +202,7 @@ function changeColour(id) {
 }
 
 function highlight(id) {
-    var disc = document.getElementById(id);
+    var disc = getLastInColumn(id);
     if (colour == "yellow") {
         disc.style.backgroundColor = "rgb(255, 255, 50, 0.8)";
 
@@ -211,28 +211,42 @@ function highlight(id) {
     }
 }
 function dehighlight(id) {
-    var disc = document.getElementById(id);
+    var disc = getLastInColumn(id);
     disc.style.backgroundColor = "rgb(190, 204, 204";
 }
 
 function drop(id) {
-    var tileArr = document.getElementsByName("0")
-}
-function getColumn(id) {
-    var column = id.substr(1, 1);
-    var tileArr = document.getElementsByClassName("disc");
-    tileArr = Array.from(tileArr);
-    var colArr = [];
-    for (disc in tileArr) {
-        var discId = disc.id;
-        if (discId.substr(1, 1) == column) {
-            colArr.push(disc);
-        }
-        console.log(colArr[colArr.lastIndexOf]);
-        return (colArr[colArr.lastIndexOf]);
+    var disc = getLastInColumn(id);
+    disc.className = "disc filled";
+    changeColour(disc.id);
+    disc.onclick = false;
+    disc.onmouseover = false;
+    disc.onmouseleave = false;
 
-    };
 }
+function getLastInColumn(id) {
+    var column = id.substr(1, 1);
+    var colArr = [];
+    var lastNonFilledElement;
+  
+    
+    var htmlTileArr = document.getElementsByClassName("disc");
+    console.log(htmlTileArr);
+    for (i = 0; i < htmlTileArr.length; i++) {
+        var doc = htmlTileArr[i];
+        var docId = doc.id;
+        var colId = docId.substr(1,1);
+        if (colId == column){
+            if(doc.classList.contains("empty")){
+                colArr.push(doc);
+            }
+            
+        }
+    }
+    lastNonFilledElement = colArr[colArr.length-1];
+    return lastNonFilledElement;
+    };
+
 function updateTimer() {
     if (startTimer) {
         var timer = document.getElementById("timer");
