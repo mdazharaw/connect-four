@@ -78,7 +78,12 @@ button:hover
     border-radius: 50%;
      background-color:rgb(190, 204, 204);
 }
-.disc:hover
+/* .disc:hover
 {
     background-color: bisque;
+} */
+#turnIndicator
+{  
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
