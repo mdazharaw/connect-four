@@ -4,6 +4,7 @@ var easterEgg = document.getElementById("easterEgg");
 var click = 4;
 var hoverSound = new sound("audio/hover.mp3");
 var clickSound = new sound("audio/click.mp3");
+var boardArray = [];
 hideButtons();
 document.addEventListener("click", start);
 document.addEventListener("keypress", start);
@@ -12,13 +13,17 @@ singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
     clickSound.play();
     console.log("Single Player Mode Selected");
     hideButtons();
+    turnIndicator();
     drawBoard();
+    document.getElementById("gameBoard").style.display = "grid";
 })
 multiPlayerBtn.addEventListener("click", function multiButtonPress(event) {
     clickSound.play();
     console.log("Multiplayer Mode Selected");
     hideButtons();
+    turnIndicator();
     drawBoard();
+    document.getElementById("gameBoard").style.display = "grid";
 })
 singlePlayerBtn.addEventListener("mouseover", function singleButtonPress(event) {
     hoverSound.play();
@@ -59,17 +64,36 @@ function start(){
     removeElement("toStart");
     showButtons();
 }
-function drawBoard() {
+function turnIndicator() {
     var turnIndicator = document.createElement("h2");
     turnIndicator.display = "block";
+    turnIndicator.style.marginTop = "10px";
+    turnIndicator.style.marginBottom = "10px";
     turnIndicator.innerHTML = "Red goes first";
     turnIndicator.style.color = "red";
     turnIndicator.id = "turnIndicator";
     document.getElementById("container").insertBefore(turnIndicator, document.getElementById("gameBoard"));
-
-
-
 }
+
+function drawBoard(){
+    var gameBoard = document.getElementById("gameBoard");
+    i = 0;
+    while (i<49){
+        var tile = document.createElement("div");
+        tile.className = "tile";
+        var disc = document.createElement("div");
+        disc.className = "disc";
+        disc.id = i;
+        disc.onclick = function () {
+            hoverSound.play();
+        }
+        tile.appendChild(disc);
+        gameBoard.appendChild(tile);
+        i++ ;
+    }
+    
+}
+
 function sound(src) {
     this.sound = document.createElement("audio");
     this.sound.src = src;

@@ -2,6 +2,7 @@
 font-family: 'Righteous', cursive;}
 h1{
     font-size: 50px;
+    margin: 10px;
 }
 ::selection {
     color: none;
@@ -40,8 +41,8 @@ button:hover
 
 #easterEgg:hover
 {
-    color: goldenrod;
-     -webkit-text-stroke-width: 1px;
+  color: goldenrod;
+  -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
 }
 .buttons{
@@ -58,9 +59,26 @@ button:hover
 
 }#gameBoard{
  display: grid;
-  justify-content: center;
-  width : 490px;
-  height : 420px;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  /* grid-template-rows: auto auto auto auto auto auto auto; */
+  width : 385px;
+  height : 385px;
  
 
+}
+.tile{
+    width: auto;
+    height: auto;
+    margin: 0 0 0 0;
+    background-color: darkslategrey;
+}
+.disc{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+     background-color:rgb(190, 204, 204);
+}
+.disc:hover
+{
+    background-color: bisque;
 }
