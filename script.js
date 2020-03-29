@@ -150,7 +150,7 @@ function drawBoard() {
     var id = "";
     var row = 0;
     var col = 0;
-    while (i <= (boardSize * boardSize)) {
+    while (i <= (boardSize * (boardSize-1))){
         id = row.toString().concat(col.toString());
         var tile = createTile(id);
         gameBoard.appendChild(tile);

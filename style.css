@@ -71,7 +71,7 @@ button:hover
 }#gameBoard{
  display: grid;
   width : 385px;
-  height : 385px;
+  height : 330px;
 
 }
 
