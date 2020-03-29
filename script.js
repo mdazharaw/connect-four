@@ -4,16 +4,18 @@ var easterEgg = document.getElementById("easterEgg");
 var click = 4;
 var hoverSound = new sound("audio/hover.mp3");
 var clickSound = new sound("audio/click.mp3");
+var winSound = new sound("audio/win.mp3");
 var boardArray = [];
 document.addEventListener("click", start);
 document.addEventListener("keypress", start);
-var turn = 1;
+var turn = false;
 var firstPlayer = "🔴";
 var secondPlayer = "🟡";
 var colour = "red";
 var startTimer = false;
 var gameOver = false;
 var winner = "";
+var winningArray = []
 var boardSize = 6; // default board size
 
 //Starting Actions
@@ -129,7 +131,7 @@ function getSize(input) {
     var temp = parseInt(input);
     if (temp != NaN) {
         boardSize = temp;
-        console.log(`Board size set to ${boardSize}`);
+        console.log(`Board size set to ${boardSize - 1} by ${boardSize}`);
     }
 
     var style = document.getElementById('gridStyle');
@@ -150,7 +152,7 @@ function drawBoard() {
     var id = "";
     var row = 0;
     var col = 0;
-    while (i <= (boardSize * (boardSize-1))){
+    while (i <= (boardSize * (boardSize - 1))) {
         id = row.toString().concat(col.toString());
         var tile = createTile(id);
         gameBoard.appendChild(tile);
@@ -177,8 +179,6 @@ function createTile(id) {
         // console.log(this.id);
         hoverSound.play();
         drop(this.id);
-        swapTurn();
-
     }
     disc.onmouseover = function () {
         // console.log(this.id);
@@ -200,18 +200,42 @@ function mapTile(id, value) {
 
 function swapTurn() {
     var turnId = document.getElementById("turnIndicator");
-    if (turn % 2 == 1) {
-        turnId.style.color = "yellow";
-        turnId.innerText = "Yellow's Turn";
-        colour = "yellow";
-
-    } else if (turn % 2 == 0) {
-        turnId.style.color = "red";
-        turnId.innerText = "Red's Turn";
-        colour = "red";
+    if (winner == "") {
+        if (turn == false) {
+            turnId.style.color = "yellow";
+            turnId.innerText = "Yellow's Turn";
+            colour = "yellow";
+            turn = true;
+        } else if (turn == true) {
+            turnId.style.color = "red";
+            turnId.innerText = "Red's Turn";
+            colour = "red";
+            turn = false;
+        }
+        console.log(turn);
+        setTimeout(resetTimer(), 500);
     }
-    turn++;
-    resetTimer();
+    else if (winner == "🔴") {
+        turnId.style.color = "red";
+        turnId.innerText = "Red Player Wins!";
+        startTimer = false;
+        var timer = document.getElementById("timer");
+        timer.innerText = "🎉";
+        disableRemaining();
+        winSound.play();
+
+    }
+    else if (winner == "🟡") {
+        turnId.style.color = "yellow";
+        turnId.innerText = "Yellow Player Wins!";
+        startTimer = false;
+        var timer = document.getElementById("timer");
+        timer.innerText = "🎉";
+        disableRemaining();
+        winSound.play();
+
+    };
+
 
 }
 
@@ -220,7 +244,6 @@ function changeColour(id) {
     if (colour == "yellow") {
         disc.style.backgroundColor = "yellow";
         mapTile(id, "🟡");
-
     } else if (colour == "red") {
         disc.style.backgroundColor = "red";
         mapTile(id, "🔴");
@@ -281,6 +304,7 @@ function updateTimer() {
             time -= 1;
             timer.innerText = time;
         } else if (time == 0) {
+            alert("Times Up! Next player's turn...");
             swapTurn();
 
         }
@@ -303,5 +327,25 @@ function sound(src) {
     }
     this.stop = function () {
         this.sound.pause();
+    }
+}
+
+function reverseMap(docId) {
+    var rowId = docId.substr(0, 1);
+    var colId = docId.substr(1, 1);
+    rowId = parseInt(rowId);
+    colId = parseInt(colId);
+    return boardArray[rowId][colId];
+}
+
+
+function disableRemaining() {
+    var htmlTileArr = document.getElementsByClassName("empty");
+    // console.log(htmlTileArr);
+    for (i = 0; i < htmlTileArr.length; i++) {
+        var disc = htmlTileArr[i];
+        disc.onclick = false;
+        disc.onmouseover = false;
+        disc.onmouseleave = false;
     }
 }
