@@ -288,7 +288,7 @@ function drop(id) {
     disc.onmouseleave = false;
     // winner = checkWinner(boardArray);
     // console.log(boardArray);
-    
+
 
 }
 function getLastInColumn(id) {
@@ -322,7 +322,7 @@ function updateTimer() {
             time -= 1;
             timer.innerText = time;
         } else if (time == 0) {
-            //alert("Times Up! Next player's turn...");
+            alert("Times Up! Next player's turn...");
             swapTurn();
 
         }
@@ -390,28 +390,47 @@ function checkMatch(a, b, c, d) {
 
 function checkWinner() {
     var win = false;
-    var horizontalWin,verticalWin,rightDiagonalWin,leftDiagonalWin = false;
-    for (var rowId = 0; rowId <= boardSize; rowId++) {
-        for (var colId = 0; colId<= boardSize; colId++) {
-            if (win == false) {
-                try {
-                    horizontalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId][colId + 1], boardArray[rowId][colId + 2], boardArray[rowId][colId + 3]);
-                    verticalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId], boardArray[rowId + 2][colId], boardArray[rowId + 3][colId]);
-                    rightDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId + 1], boardArray[rowId + 2][colId + 2], boardArray[rowId + 3][colId + 3]);
-                    leftDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId - 1][colId + 1], boardArray[rowId - 2][colId + 2], boardArray[rowId - 3][colId + 3]);
-                } catch (error) {
-                }
+    var horizontalWin, verticalWin, rightDiagonalWin, leftDiagonalWin = false;
+    var filledDiscArr = document.getElementsByClassName("filled");
+    var discInfoArr = [];
+    for (i = 0; i < filledDiscArr.length; i++) {
+        var disc = filledDiscArr[i];
+        var discId = disc.id;
+        var discInfo = getDiscInfo(discId);
+        discInfoArr.push(discInfo);
+    }
+    // for (var rowId = 0; rowId <= boardSize; rowId++) {
+    // for (var colId = 0; colId<= boardSize; colId++) {
+    for (id in discInfoArr) {
+        var rowId = discInfoArr[id].row;
+        var colId = discInfoArr[id].column;
+        var colour = discInfoArr[id].colour;
 
+
+        if (win == false) {
+            try {
+                horizontalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId][colId + 1], boardArray[rowId][colId + 2], boardArray[rowId][colId + 3]);
+            } catch (error) { }
+            try {
+                verticalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId], boardArray[rowId + 2][colId], boardArray[rowId + 3][colId]);
+            } catch (error) { }
+            try {
+                rightDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId + 1], boardArray[rowId + 2][colId + 2], boardArray[rowId + 3][colId + 3]);
+            } catch (error) { }
+            try {
+                leftDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId - 1][colId + 1], boardArray[rowId - 2][colId + 2], boardArray[rowId - 3][colId + 3]);
+            } catch (error) { }
+
+            finally {
                 if (horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin) {
                     win = true;
-                    winner = boardArray[rowId][colId];
+                    winner = colour;
                     console.log(winner);
                 }
             }
-
         }
-
     }
+
     return winner;
 }
 
