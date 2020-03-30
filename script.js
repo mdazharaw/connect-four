@@ -9,8 +9,8 @@ var boardArray = [];
 document.addEventListener("click", start);
 document.addEventListener("keypress", start);
 var turn = false;
-var firstPlayer = "🔴";
-var secondPlayer = "🟡";
+var redPlayerArray = [];
+var yellowPlayerArray = [];
 var colour = "red";
 var startTimer = false;
 var gameOver = false;
@@ -165,7 +165,7 @@ function drawBoard() {
             boardArray.push(rowArr);
         }
 
-    }
+    } return boardArray;
 
 }
 
@@ -179,6 +179,9 @@ function createTile(id) {
         // console.log(this.id);
         hoverSound.play();
         drop(this.id);
+        swapTurn();
+
+
     }
     disc.onmouseover = function () {
         // console.log(this.id);
@@ -212,7 +215,7 @@ function swapTurn() {
             colour = "red";
             turn = false;
         }
-        console.log(turn);
+        // console.log(turn);
         setTimeout(resetTimer(), 500);
     }
     else if (winner == "🔴") {
@@ -239,38 +242,53 @@ function swapTurn() {
 
 }
 
-function changeColour(id) {
+function placeDisc(id) {
     var disc = document.getElementById(id);
     if (colour == "yellow") {
         disc.style.backgroundColor = "yellow";
         mapTile(id, "🟡");
+        yellowPlayerArray.push(parseInt(id));
+        winner = checkWinner();
     } else if (colour == "red") {
         disc.style.backgroundColor = "red";
         mapTile(id, "🔴");
+        redPlayerArray.push(parseInt(id));
+        winner = checkWinner();
+
+
     }
 }
 
 function highlight(id) {
+    var dropPoint = document.getElementById(id);
     var disc = getLastInColumn(id);
     if (colour == "yellow") {
-        disc.style.backgroundColor = "rgb(255, 255, 50, 0.8)";
-
+        disc.style.backgroundColor = "rgb(255, 255, 50,0.7)";
+        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";
     } else if (colour == "red") {
-        disc.style.backgroundColor = "rgb(255, 50, 50, 0.8)";
+        disc.style.backgroundColor = "rgb(255, 50, 50,0.7)";
+        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";;
+
     }
 }
 function dehighlight(id) {
     var disc = getLastInColumn(id);
     disc.style.backgroundColor = "rgb(190, 204, 204";
+    var dropPoint = document.getElementById(id);
+    dropPoint.style.backgroundColor = "rgb(190, 204, 204";
+
 }
 
 function drop(id) {
     var disc = getLastInColumn(id);
     disc.className = "disc filled";
-    changeColour(disc.id);
+    placeDisc(disc.id);
     disc.onclick = false;
     disc.onmouseover = false;
     disc.onmouseleave = false;
+    // winner = checkWinner(boardArray);
+    // console.log(boardArray);
+    
 
 }
 function getLastInColumn(id) {
@@ -304,7 +322,7 @@ function updateTimer() {
             time -= 1;
             timer.innerText = time;
         } else if (time == 0) {
-            alert("Times Up! Next player's turn...");
+            //alert("Times Up! Next player's turn...");
             swapTurn();
 
         }
@@ -330,12 +348,21 @@ function sound(src) {
     }
 }
 
-function reverseMap(docId) {
+function getDiscInfo(docId) {
+    docId = docId.toString();
     var rowId = docId.substr(0, 1);
     var colId = docId.substr(1, 1);
     rowId = parseInt(rowId);
     colId = parseInt(colId);
-    return boardArray[rowId][colId];
+    discId = parseInt(docId);
+    var value = boardArray[rowId][colId];
+    var discInfo = {
+        row: rowId,
+        column: colId,
+        colour: value,
+        disc: discId,
+    }
+    return discInfo;
 }
 
 
@@ -348,4 +375,51 @@ function disableRemaining() {
         disc.onmouseover = false;
         disc.onmouseleave = false;
     }
+}
+function checkMatch(a, b, c, d) {
+    var array = [a, b, c, d];
+    if (array.includes(null) || array.includes(undefined)) {
+        return false;
+    }
+    else {
+        console.log(array);
+        return ((a != null) && (a == b) && (a == c) && (a == d));
+    }
+}
+
+
+function checkWinner() {
+    var win = false;
+    var horizontalWin,verticalWin,rightDiagonalWin,leftDiagonalWin = false;
+    for (var rowId = 0; rowId <= boardSize; rowId++) {
+        for (var colId = 0; colId<= boardSize; colId++) {
+            if (win == false) {
+                try {
+                    horizontalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId][colId + 1], boardArray[rowId][colId + 2], boardArray[rowId][colId + 3]);
+                    verticalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId], boardArray[rowId + 2][colId], boardArray[rowId + 3][colId]);
+                    rightDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId + 1], boardArray[rowId + 2][colId + 2], boardArray[rowId + 3][colId + 3]);
+                    leftDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId - 1][colId + 1], boardArray[rowId - 2][colId + 2], boardArray[rowId - 3][colId + 3]);
+                } catch (error) {
+                }
+
+                if (horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin) {
+                    win = true;
+                    winner = boardArray[rowId][colId];
+                    console.log(winner);
+                }
+            }
+
+        }
+
+    }
+    return winner;
+}
+
+
+function splitId(id) {
+    id = id.toString();
+    var row = parseInt(id.substr(0, 1));
+    var col = parseInt(id.substr(1, 1));
+    var array = [row, col];
+    return array;
 }
