@@ -8,11 +8,13 @@ var startTimer = false; // Timer status, initially disabled
 var winner = ""; // Stores the winning disc type
 var winningArray = [] // Stores the set of winning discs
 var boardSize = 6; // default board size
+var singlePlayer = false; // Single player mode not selected
 
 // Creating sound objects
 var hoverSound = new sound("audio/hover.mp3");
 var clickSound = new sound("audio/click.mp3");
 var winSound = new sound("audio/win.mp3");
+var loseSound = new sound("audio/lose.mp3");
 
 // Initial click and key listeners for starting the game
 document.addEventListener("click", start);
@@ -30,6 +32,7 @@ var easterEgg = document.getElementById("easterEgg"); //😏
 var click = 4;
 
 singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
+    singlePlayer = true;
     clickSound.play();
     console.log("Single Player Mode Selected");
     hideOptions();
@@ -121,7 +124,11 @@ function showFunctions() {
     var turnIndicator = document.createElement("h2");
     turnIndicator.style.marginTop = "0px";
     turnIndicator.style.marginBottom = "20px";
-    turnIndicator.innerHTML = "Red goes first";
+    if (singlePlayer) {
+        turnIndicator.innerHTML = "Player goes first";
+    } else {
+        turnIndicator.innerHTML = "Red goes first";
+    }
     turnIndicator.style.color = "red";
     turnIndicator.id = "turnIndicator";
     document.getElementById("functionals").appendChild(turnIndicator);
@@ -172,7 +179,8 @@ function updateTimer() {
             time -= 1;
             timer.innerText = time;
         } else if (time == 0) {
-            alert("Times Up! Next player's turn...");
+            //alert("Times Up! Next player's turn...");
+            alertModal();
             swapTurn();
 
         }
@@ -280,12 +288,16 @@ function highlight(id) {
     var dropPoint = document.getElementById(id);
     var disc = getLastInColumn(id);
     if (colour == "yellow") {
-        disc.style.backgroundColor = "rgb(255, 255, 50,0.7)";
-        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";
-    } else if (colour == "red") {
-        disc.style.backgroundColor = "rgb(255, 50, 50,0.7)";
-        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";;
+        if (disc != dropPoint) {
+            dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.7)";
 
+        }
+        disc.style.backgroundColor = "rgb(255, 255, 50,0.7)";
+    } else if (colour == "red") {
+        if (disc != dropPoint) {
+            dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.7)";
+        }
+        disc.style.backgroundColor = "rgb(255, 50, 50,0.7)";
     }
 }
 // Changes colour back to default when not selected
@@ -301,42 +313,111 @@ function dehighlight(id) {
 
 // Toggles player turn if winner not found
 function swapTurn() {
-    var turnId = document.getElementById("turnIndicator");
-    if (winner == "") {
-        if (turn == false) {
-            turnId.style.color = "yellow";
-            turnId.innerText = "Yellow's Turn";
-            colour = "yellow";
-            turn = true;
-        } else if (turn == true) {
-            turnId.style.color = "red";
-            turnId.innerText = "Red's Turn";
-            colour = "red";
-            turn = false;
+    var empty = document.getElementsByClassName("empty");
+    if(empty.length == 0){
+        winner = "draw";
+    }
+    if (singlePlayer == false) {
+        var turnId = document.getElementById("turnIndicator");
+        if (winner == "") {
+            if (turn == false) {
+                turnId.style.color = "yellow";
+                turnId.innerText = "Yellow's Turn";
+                colour = "yellow";
+                turn = true;
+            } else if (turn == true) {
+                turnId.style.color = "red";
+                turnId.innerText = "Red's Turn";
+                colour = "red";
+                turn = false;
+            }
+            // console.log(turn);
+            setTimeout(resetTimer(), 500);
         }
-        // console.log(turn);
-        setTimeout(resetTimer(), 500);
-    }
-    else if (winner == "🔴") {
-        turnId.style.color = "red";
-        turnId.innerText = "Red Player Wins!";
-        startTimer = false;
-        var timer = document.getElementById("timer");
-        timer.innerText = "🎉";
-        disableRemaining();
-        winSound.play();
+        else if (winner == "🔴") {
+            turnId.style.color = "red";
+            turnId.innerText = "Red Player Wins!";
+            startTimer = false;
+            var timer = document.getElementById("timer");
+            timer.innerText = "🎉";
+            disableRemainingSlots();
+            winSound.play();
 
-    }
-    else if (winner == "🟡") {
-        turnId.style.color = "yellow";
-        turnId.innerText = "Yellow Player Wins!";
-        startTimer = false;
-        var timer = document.getElementById("timer");
-        timer.innerText = "🎉";
-        disableRemaining();
-        winSound.play();
+        }
+        else if (winner == "🟡") {
+            turnId.style.color = "yellow";
+            turnId.innerText = "Yellow Player Wins!";
+            startTimer = false;
+            var timer = document.getElementById("timer");
+            timer.innerText = "🎉";
+            disableRemainingSlots();
+            winSound.play();
 
-    };
+        }
+        else if (winner == "draw") {
+            turnId.style.color = "black";
+            turnId.innerText = "It's a Draw!";
+            startTimer = false;
+            var timer = document.getElementById("timer");
+            timer.innerText = "😐";
+            disableRemainingSlots();
+            loseSound.play();
+
+        };
+    }
+    else if (singlePlayer == true) {
+        var turnId = document.getElementById("turnIndicator");
+        if (winner == "") {
+            if (turn == false) {
+                disableRemainingSlots();
+                blinkingCPU();
+                turnId.style.color = "yellow";
+                turnId.innerText = "CPU's Turn";
+                colour = "yellow";
+                turn = true;
+                setTimeout(cpuAction, 3000);
+
+            } else if (turn == true) {
+                enableRemainingSlots();
+                turnId.style.color = "red";
+                turnId.innerText = "Player's Turn";
+                colour = "red";
+                turn = false;
+            }
+            else if (winner == "draw") {
+                turnId.style.color = "black";
+                turnId.innerText = "It's a Draw!";
+                startTimer = false;
+                var timer = document.getElementById("timer");
+                timer.innerText = "😐";
+                disableRemainingSlots();
+                loseSound.play();
+
+            };
+            // console.log(turn);
+            setTimeout(resetTimer(), 500);
+        }
+        else if (winner == "🔴") {
+            turnId.style.color = "red";
+            turnId.innerText = "Player Wins!";
+            startTimer = false;
+            var timer = document.getElementById("timer");
+            timer.innerText = "🎉";
+            disableRemainingSlots();
+            winSound.play();
+
+        }
+        else if (winner == "🟡") {
+            turnId.style.color = "yellow";
+            turnId.innerText = "CPU Wins!";
+            startTimer = false;
+            var timer = document.getElementById("timer");
+            timer.innerText = "😐";
+            disableRemainingSlots();
+            loseSound.play();
+
+        };
+    }
 
 
 }
@@ -351,13 +432,15 @@ function placeDisc(id) {
     var disc = document.getElementById(id);
     if (colour == "yellow") {
         disc.style.backgroundColor = "yellow";
+        disc.className = "disc filled yellow";
         mapTile(id, "🟡");
-        yellowPlayerArray.push(parseInt(id));
+        yellowPlayerArray.push((id));
         winner = checkWinner();
     } else if (colour == "red") {
         disc.style.backgroundColor = "red";
+        disc.className = "disc filled red";
         mapTile(id, "🔴");
-        redPlayerArray.push(parseInt(id));
+        redPlayerArray.push((id));
         winner = checkWinner();
     }
 }
@@ -418,11 +501,12 @@ function getDiscInfo(docId) {
 // Game Ending / Winning Functions
 
 // Once winner is found, disables remaining discs event listeners
-function disableRemaining() {
+function disableRemainingSlots() {
     var htmlTileArr = document.getElementsByClassName("empty");
     // console.log(htmlTileArr);
     for (i = 0; i < htmlTileArr.length; i++) {
         var disc = htmlTileArr[i];
+        disc.style.backgroundColor = "rgb(190, 204, 204)";
         disc.onclick = false;
         disc.onmouseover = false;
         disc.onmouseleave = false;
@@ -497,7 +581,7 @@ function checkWinner() {
                         winningArray = [discId, idCalc(discId, -1, 1), idCalc(discId, -2, 2), idCalc(discId, -3, 3)]
                     }
                     highlightWinner(winningArray);
-                    console.log(winningArray);
+                    // console.log(winningArray);
                     // console.log(winner);
                     return winner;
                 }
@@ -513,8 +597,156 @@ function highlightWinner(winningArray) {
     for (id in winningArray) {
         var winningDisc = document.getElementById(winningArray[id]);
         if (winner == "🔴") {
-            winningDisc.className += " red winner";
+            winningDisc.className += " winner";
         } else if (winner == "🟡")
-            winningDisc.className += " yellow winner";
+            winningDisc.className += " winner";
+    }
+}
+
+// CPU Player functions
+
+function enableRemainingSlots() {
+    var htmlTileArr = document.getElementsByClassName("empty");
+    // console.log(htmlTileArr);
+    for (i = 0; i < htmlTileArr.length; i++) {
+        var disc = htmlTileArr[i];
+        disc.className = " disc empty";
+        disc.onclick = function () {
+            // console.log(this.id);
+            hoverSound.play();
+            drop(this.id);
+            swapTurn();
+        }
+        disc.onmouseover = function () {
+            // console.log(this.id);
+            highlight(this.id);
+        }
+        disc.onmouseleave = function () {
+            // console.log(this.id);
+            dehighlight(this.id);
+        }
+    }
+}
+
+function blinkingCPU() {
+    var htmlTileArr = document.getElementsByClassName("empty");
+    for (i = 0; i < htmlTileArr.length; i++) {
+        var disc = htmlTileArr[i];
+        disc.className = "disc empty cpu";
+    }
+}
+function cpuAction() {
+    counterMeasure();
+    alertModal();
+    swapTurn();
+}
+
+function alertModal() {
+    startTimer = false;
+    var modal = document.getElementById("myModal");
+    var span = document.getElementsByClassName("close")[0];
+    modal.style.display = "block";
+    span.onclick = function () {
+        modal.style.display = "none";
+        resetTimer();
+        startTimer = true;
+    }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+            resetTimer();
+            startTimer = true;
+        }
+    }
+}
+function dropRandom() {
+    var emptyTileArr = [];
+    var htmlTileArr = document.getElementsByClassName("empty");
+    for (i = 0; i < htmlTileArr.length; i++) {
+        var doc = htmlTileArr[i];
+        emptyTileArr.push(doc);
+    }
+    var length = emptyTileArr.length;
+    var randIndex = Math.floor(Math.random() * length);
+    var randomDisc = emptyTileArr[randIndex];
+    drop(randomDisc.id);
+}
+function counterMeasure() {
+    var redLastPlayed = redPlayerArray[redPlayerArray.length - 1];
+    console.log(redLastPlayed);
+    var adjIds = adjacentIds(redLastPlayed);
+    if (adjIds.length != 0) {
+        for (id in adjIds) {
+            var randIndex = Math.floor(Math.random() * adjIds.length);
+            var disc = document.getElementById(adjIds[randIndex]);
+            if (disc.className.includes("empty")) {
+                drop(disc.id);
+                break;
+            } else {
+                dropRandom();
+                break;
+            }
+        }
+    }
+}
+function adjacentIds(id) {
+    var adjIds = [];
+    try {
+        var idUp = idCalc(id, -1, 0);
+        var disc = document.getElementById(idUp);
+        if(disc.className.includes("empty")){
+            adjIds.push(idUp);
+        }
+  
+    } catch (error) { }
+    try {
+        var idLeft = idCalc(id, 0, -1);
+        var disc = document.getElementById(idLeft);
+        if (disc.className.includes("empty")) {
+            adjIds.push(idLeft);
+        }
+
+        adjIds.push(idLeft);
+    } catch (error) { }
+    try {
+        var idRight = idCalc(id, 0, 1);
+        var disc = document.getElementById(idRight);
+        if (disc.className.includes("empty")) {
+            adjIds.push(idRight);
+        }
+
+        adjIds.push(idRight);
+
+    } catch (error) { }
+    return adjIds;
+}
+
+function detectWin(){
+    var redTracker = {};
+    for (i=0;i<boardSize;i++){
+        redTracker[`column ${i}`] = 0;
+    }
+    for (i = 0; i < boardSize-1; i++) {
+        redTracker[`row ${i}`] = 0;
+    }
+
+    var sameColCount = 0;
+    var sameRowCount = 0;
+    for (id in redPlayerArray){
+        var split = redPlayerArray[id];
+        var row = split[0];
+        var col = split[1];
+        redTracker[`column ${i}`] += 1;
+        redTracker[`row ${i}`] += 1;
+    }
+    for (const key in redTracker) {
+        if (redTracker.hasOwnProperty(key)) {
+            const element = redTracker[key];
+            if (element==3) {
+
+                
+            }
+            
+        }
     }
 }
