@@ -1,26 +1,33 @@
-var singlePlayerBtn = document.getElementById("singlePlayer");
-var multiPlayerBtn = document.getElementById("multiPlayer");
-var easterEgg = document.getElementById("easterEgg");
-var click = 4;
+// Global Variables:
+var boardArray = []; // Representation of game board
+var turn = false; // Toggles turns back and forth
+var redPlayerArray = []; // Keeps track of all red players discs
+var yellowPlayerArray = []; // Keeps track of all yellow players discs
+var colour = "red"; // Starting player colour
+var startTimer = false; // Timer status, initially disabled
+var winner = ""; // Stores the winning disc type
+var winningArray = [] // Stores the set of winning discs
+var boardSize = 6; // default board size
+
+// Creating sound objects
 var hoverSound = new sound("audio/hover.mp3");
 var clickSound = new sound("audio/click.mp3");
 var winSound = new sound("audio/win.mp3");
-var boardArray = [];
+
+// Initial click and key listeners for starting the game
 document.addEventListener("click", start);
 document.addEventListener("keypress", start);
-var turn = false;
-var redPlayerArray = [];
-var yellowPlayerArray = [];
-var colour = "red";
-var startTimer = false;
-var gameOver = false;
-var winner = "";
-var winningArray = []
-var boardSize = 6; // default board size
 
-//Starting Actions
-hideOptions();
-setInterval(updateTimer, 1000);
+
+//Starting Actions:
+hideOptions(); // Option buttons and forms hidden at start
+setInterval(updateTimer, 1000); // Create timer to tick every second
+
+//Setting event listeners
+var singlePlayerBtn = document.getElementById("singlePlayer");
+var multiPlayerBtn = document.getElementById("multiPlayer");
+var easterEgg = document.getElementById("easterEgg"); //😏
+var click = 4;
 
 singlePlayerBtn.addEventListener("click", function singleButtonPress(event) {
     clickSound.play();
@@ -62,11 +69,16 @@ easterEgg.addEventListener("click", function (event) {
 
 })
 
+
+// Helper functions:
+
+// Shortcut function to remove element from parent
 function removeElement(elementId) {
     var element = document.getElementById(elementId);
     element.parentNode.removeChild(element);
 }
 
+// Hides option elements
 function hideOptions() {
     var buttonDiv = document.getElementById("buttonDiv");
     buttonDiv.style.display = "none";
@@ -74,6 +86,7 @@ function hideOptions() {
     sizeSelector.style.display = "none";
 }
 
+// Shows option elements
 function showOptions() {
     document.removeEventListener("click", start);
     document.removeEventListener("keypress", start);
@@ -83,12 +96,14 @@ function showOptions() {
     buttonDiv.style.display = "flex";
 }
 
+// Starts game upon first interaction with page
 function start() {
     clickSound.play();
     removeElement("toStart");
     showOptions();
 }
 
+// Functions such as restart button, turn indicator and timer shown once game is started
 function showFunctions() {
 
     var restart = document.createElement("h2");
@@ -127,6 +142,8 @@ function showFunctions() {
     }, 500);
 
 }
+
+// Gets board size from the selector
 function getSize(input) {
     var temp = parseInt(input);
     if (temp != NaN) {
@@ -146,12 +163,76 @@ function getSize(input) {
 
 }
 
+// Updates timer countdown and carries out action on timeout
+function updateTimer() {
+    if (startTimer) {
+        var timer = document.getElementById("timer");
+        var time = parseInt(timer.innerText);
+        if (time > 0) {
+            time -= 1;
+            timer.innerText = time;
+        } else if (time == 0) {
+            alert("Times Up! Next player's turn...");
+            swapTurn();
+
+        }
+    }
+};
+
+// Resets timer countdown to 20
+function resetTimer() {
+    var timer = document.getElementById("timer");
+    timer.innerText = 20;
+}
+
+// For creation of sound objects
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function () {
+        this.sound.play();
+    }
+    this.stop = function () {
+        this.sound.pause();
+    }
+}
+
+// Takes in a id in string and outputs row and column attributes in array[int]
+function splitId(id) {
+    id = id.toString();
+    var row = parseInt(id.substr(0, 1));
+    var col = parseInt(id.substr(1, 1));
+    var array = [row, col];
+    return array;
+}
+
+// Used for manipulating the ids
+function idCalc(id, addRow, addCol) {
+    var idArr = splitId(id);
+    addRow = parseInt(addRow);
+    addCol = parseInt(addCol);
+    var row = idArr[0] + addRow;
+    var col = idArr[1] + addCol;
+    row = row.toString();
+    col = col.toString();
+    var returnId = row + col;
+    return returnId;
+}
+
+// Game board creation functions:
+
+// Builds game board based on size of board selected
 function drawBoard() {
     var gameBoard = document.getElementById("gameBoard");
     var i = 1;
     var id = "";
     var row = 0;
     var col = 0;
+    // Appends a tile to the board via loops, segmented by row and column, id is also assigned to the discs
     while (i <= (boardSize * (boardSize - 1))) {
         id = row.toString().concat(col.toString());
         var tile = createTile(id);
@@ -162,26 +243,26 @@ function drawBoard() {
             col = 0;
             row++;
             var rowArr = new Array(boardSize).fill(null);
-            boardArray.push(rowArr);
+            boardArray.push(rowArr); // Filling up of board array representation
         }
 
     } return boardArray;
 
 }
 
+//Creates a tile with an empty disc
 function createTile(id) {
     var tile = document.createElement("div");
     tile.className = "tile";
     var disc = document.createElement("div");
     disc.className = "disc empty";
     disc.id = id;
+    // Designates click and hover behaviour of discs
     disc.onclick = function () {
         // console.log(this.id);
         hoverSound.play();
         drop(this.id);
         swapTurn();
-
-
     }
     disc.onmouseover = function () {
         // console.log(this.id);
@@ -194,13 +275,31 @@ function createTile(id) {
     tile.appendChild(disc);
     return tile;
 }
+// Changes colour of disc depending on current player upon hover
+function highlight(id) {
+    var dropPoint = document.getElementById(id);
+    var disc = getLastInColumn(id);
+    if (colour == "yellow") {
+        disc.style.backgroundColor = "rgb(255, 255, 50,0.7)";
+        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";
+    } else if (colour == "red") {
+        disc.style.backgroundColor = "rgb(255, 50, 50,0.7)";
+        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";;
 
-function mapTile(id, value) {
-    var split1 = parseInt(id.substr(0, 1));
-    var split2 = parseInt(id.substr(1, 1));
-    boardArray[split1][split2] = value;
+    }
+}
+// Changes colour back to default when not selected
+function dehighlight(id) {
+    var disc = getLastInColumn(id);
+    disc.style.backgroundColor = "rgb(190, 204, 204";
+    var dropPoint = document.getElementById(id);
+    dropPoint.style.backgroundColor = "rgb(190, 204, 204";
+
 }
 
+// Game play related functions:
+
+// Toggles player turn if winner not found
 function swapTurn() {
     var turnId = document.getElementById("turnIndicator");
     if (winner == "") {
@@ -241,7 +340,13 @@ function swapTurn() {
 
 
 }
-
+// Maps value of played disc into board array
+function mapTile(id, value) {
+    var split1 = parseInt(id.substr(0, 1));
+    var split2 = parseInt(id.substr(1, 1));
+    boardArray[split1][split2] = value;
+}
+// Places a disc at a given id location
 function placeDisc(id) {
     var disc = document.getElementById(id);
     if (colour == "yellow") {
@@ -254,43 +359,9 @@ function placeDisc(id) {
         mapTile(id, "🔴");
         redPlayerArray.push(parseInt(id));
         winner = checkWinner();
-
-
     }
 }
-
-function highlight(id) {
-    var dropPoint = document.getElementById(id);
-    var disc = getLastInColumn(id);
-    if (colour == "yellow") {
-        disc.style.backgroundColor = "rgb(255, 255, 50,0.7)";
-        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";
-    } else if (colour == "red") {
-        disc.style.backgroundColor = "rgb(255, 50, 50,0.7)";
-        dropPoint.style.backgroundColor = "rgb(190, 204, 204,0.9)";;
-
-    }
-}
-function dehighlight(id) {
-    var disc = getLastInColumn(id);
-    disc.style.backgroundColor = "rgb(190, 204, 204";
-    var dropPoint = document.getElementById(id);
-    dropPoint.style.backgroundColor = "rgb(190, 204, 204";
-
-}
-
-function drop(id) {
-    var disc = getLastInColumn(id);
-    disc.className = "disc filled";
-    placeDisc(disc.id);
-    disc.onclick = false;
-    disc.onmouseover = false;
-    disc.onmouseleave = false;
-    // winner = checkWinner(boardArray);
-    // console.log(boardArray);
-
-
-}
+// Gets the last empty disc slot in a column
 function getLastInColumn(id) {
     var column = id.substr(1, 1);
     var colArr = [];
@@ -313,41 +384,20 @@ function getLastInColumn(id) {
     lastNonFilledElement = colArr[colArr.length - 1];
     return lastNonFilledElement;
 };
+// Places a disc at the last empty slot in a column
+function drop(id) {
+    var disc = getLastInColumn(id);
+    disc.className = "disc filled";
+    placeDisc(disc.id);
+    disc.onclick = false;
+    disc.onmouseover = false;
+    disc.onmouseleave = false;
+    // winner = checkWinner(boardArray);
+    // console.log(boardArray);
 
-function updateTimer() {
-    if (startTimer) {
-        var timer = document.getElementById("timer");
-        var time = parseInt(timer.innerText);
-        if (time > 0) {
-            time -= 1;
-            timer.innerText = time;
-        } else if (time == 0) {
-            alert("Times Up! Next player's turn...");
-            swapTurn();
 
-        }
-    }
-};
-
-function resetTimer() {
-    var timer = document.getElementById("timer");
-    timer.innerText = 20;
 }
-function sound(src) {
-    this.sound = document.createElement("audio");
-    this.sound.src = src;
-    this.sound.setAttribute("preload", "auto");
-    this.sound.setAttribute("controls", "none");
-    this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
-    this.play = function () {
-        this.sound.play();
-    }
-    this.stop = function () {
-        this.sound.pause();
-    }
-}
-
+// Returns info object of disc by id
 function getDiscInfo(docId) {
     docId = docId.toString();
     var rowId = docId.substr(0, 1);
@@ -365,7 +415,9 @@ function getDiscInfo(docId) {
     return discInfo;
 }
 
+// Game Ending / Winning Functions
 
+// Once winner is found, disables remaining discs event listeners
 function disableRemaining() {
     var htmlTileArr = document.getElementsByClassName("empty");
     // console.log(htmlTileArr);
@@ -376,6 +428,7 @@ function disableRemaining() {
         disc.onmouseleave = false;
     }
 }
+// Compares the value of 4 elements, ignoring nulls and undefined
 function checkMatch(a, b, c, d) {
     winningArray = [];
     var array = [a, b, c, d];
@@ -387,8 +440,7 @@ function checkMatch(a, b, c, d) {
         return ((a != null) && (a == b) && (a == c) && (a == d));
     }
 }
-
-
+// Compares each filled tile with their adjacent tiles to check for winning sets, try catch used to ignore index out of bound errors
 function checkWinner() {
     var win = false;
     var horizontalWin, verticalWin, rightDiagonalWin, leftDiagonalWin = false;
@@ -455,27 +507,7 @@ function checkWinner() {
     return winner;
 
 }
-
-
-function splitId(id) {
-    id = id.toString();
-    var row = parseInt(id.substr(0, 1));
-    var col = parseInt(id.substr(1, 1));
-    var array = [row, col];
-    return array;
-}
-
-function idCalc(id, addRow, addCol) {
-    var idArr = splitId(id);
-    addRow = parseInt(addRow);
-    addCol = parseInt(addCol);
-    var row = idArr[0] + addRow;
-    var col = idArr[1] + addCol;
-    row = row.toString();
-    col = col.toString();
-    var returnId = row + col;
-    return returnId;
-}
+// Takes the winning array and applies a class property that allows for blinking of winning tiles
 function highlightWinner(winningArray) {
 
     for (id in winningArray) {
