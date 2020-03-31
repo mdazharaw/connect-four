@@ -354,7 +354,7 @@ function getDiscInfo(docId) {
     var colId = docId.substr(1, 1);
     rowId = parseInt(rowId);
     colId = parseInt(colId);
-    discId = parseInt(docId);
+    discId = docId;
     var value = boardArray[rowId][colId];
     var discInfo = {
         row: rowId,
@@ -377,12 +377,13 @@ function disableRemaining() {
     }
 }
 function checkMatch(a, b, c, d) {
+    winningArray = [];
     var array = [a, b, c, d];
     if (array.includes(null) || array.includes(undefined)) {
         return false;
     }
     else {
-        console.log(array);
+        // console.log(array);
         return ((a != null) && (a == b) && (a == c) && (a == d));
     }
 }
@@ -399,39 +400,60 @@ function checkWinner() {
         var discInfo = getDiscInfo(discId);
         discInfoArr.push(discInfo);
     }
+    discInfoArr.reverse(); // traverse array from the bottom up
     // for (var rowId = 0; rowId <= boardSize; rowId++) {
     // for (var colId = 0; colId<= boardSize; colId++) {
     for (id in discInfoArr) {
         var rowId = discInfoArr[id].row;
         var colId = discInfoArr[id].column;
         var colour = discInfoArr[id].colour;
+        var discId = discInfoArr[id].disc;
 
 
         if (win == false) {
             try {
                 horizontalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId][colId + 1], boardArray[rowId][colId + 2], boardArray[rowId][colId + 3]);
+
             } catch (error) { }
             try {
                 verticalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId], boardArray[rowId + 2][colId], boardArray[rowId + 3][colId]);
+
             } catch (error) { }
             try {
                 rightDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId + 1][colId + 1], boardArray[rowId + 2][colId + 2], boardArray[rowId + 3][colId + 3]);
+
             } catch (error) { }
             try {
                 leftDiagonalWin = checkMatch(boardArray[rowId][colId], boardArray[rowId - 1][colId + 1], boardArray[rowId - 2][colId + 2], boardArray[rowId - 3][colId + 3]);
+
             } catch (error) { }
 
             finally {
                 if (horizontalWin || verticalWin || rightDiagonalWin || leftDiagonalWin) {
                     win = true;
                     winner = colour;
-                    console.log(winner);
+                    if (horizontalWin) {
+                        winningArray = [discId, idCalc(discId, 0, 1), idCalc(discId, 0, 2), idCalc(discId, 0, 3)]
+                    }
+                    else if (verticalWin) {
+                        winningArray = [discId, idCalc(discId, 1, 0), idCalc(discId, 2, 0), idCalc(discId, 3, 0)]
+                    }
+                    else if (rightDiagonalWin) {
+                        winningArray = [discId, idCalc(discId, 1, 1), idCalc(discId, 2, 2), idCalc(discId, 3, 3)]
+                    }
+                    else if (leftDiagonalWin) {
+                        winningArray = [discId, idCalc(discId, -1, 1), idCalc(discId, -2, 2), idCalc(discId, -3, 3)]
+                    }
+                    highlightWinner(winningArray);
+                    console.log(winningArray);
+                    // console.log(winner);
+                    return winner;
                 }
             }
         }
     }
-
     return winner;
+
 }
 
 
@@ -441,4 +463,26 @@ function splitId(id) {
     var col = parseInt(id.substr(1, 1));
     var array = [row, col];
     return array;
+}
+
+function idCalc(id, addRow, addCol) {
+    var idArr = splitId(id);
+    addRow = parseInt(addRow);
+    addCol = parseInt(addCol);
+    var row = idArr[0] + addRow;
+    var col = idArr[1] + addCol;
+    row = row.toString();
+    col = col.toString();
+    var returnId = row + col;
+    return returnId;
+}
+function highlightWinner(winningArray) {
+
+    for (id in winningArray) {
+        var winningDisc = document.getElementById(winningArray[id]);
+        if (winner == "🔴") {
+            winningDisc.className += " red winner";
+        } else if (winner == "🟡")
+            winningDisc.className += " yellow winner";
+    }
 }
