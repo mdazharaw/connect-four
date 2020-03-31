@@ -35,8 +35,10 @@ __What in my code and program design in the project would I do differently next 
 __What in my code and program design in the project went well? Is there anything I would do the same next time?__
 * Categorisation of functions by usage
 * Design document __*TBC*__
+--------------------------------------------------------------------------------------------------
 
 ### WDI Unit 1 Post Mortem
+
 __What habits did I use during this unit that helped me?__
 * Creating reusable function code blocks rather than repeated copy pasting.
 
