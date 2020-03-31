@@ -605,6 +605,7 @@ function highlightWinner(winningArray) {
 
 // CPU Player functions
 
+// Enables discs to be clicked after CPU turn has ended
 function enableRemainingSlots() {
     var htmlTileArr = document.getElementsByClassName("empty");
     // console.log(htmlTileArr);
@@ -628,6 +629,7 @@ function enableRemainingSlots() {
     }
 }
 
+// Adds class to all remaining empty tiles, for CSS to allow blinking animation, signifying CPU action
 function blinkingCPU() {
     var htmlTileArr = document.getElementsByClassName("empty");
     for (i = 0; i < htmlTileArr.length; i++) {
@@ -635,12 +637,15 @@ function blinkingCPU() {
         disc.className = "disc empty cpu";
     }
 }
+
+// Set of actions to be done by CPU during its turn
 function cpuAction() {
     counterMeasure();
     alertModal();
     swapTurn();
 }
 
+// Shows the Next Player, Continue window when a CPU turn is over or a player turn has timed out
 function alertModal() {
     startTimer = false;
     var modal = document.getElementById("myModal");
@@ -659,6 +664,8 @@ function alertModal() {
         }
     }
 }
+
+// Drops a disc in a randomly selected empty column
 function dropRandom() {
     var emptyTileArr = [];
     var htmlTileArr = document.getElementsByClassName("empty");
@@ -671,6 +678,8 @@ function dropRandom() {
     var randomDisc = emptyTileArr[randIndex];
     drop(randomDisc.id);
 }
+
+// Drops a disc in a random adjacent slot of the last played disc
 function counterMeasure() {
     var redLastPlayed = redPlayerArray[redPlayerArray.length - 1];
     console.log(redLastPlayed);
@@ -689,6 +698,7 @@ function counterMeasure() {
         }
     }
 }
+// Gets surrounding elements of last placed disc
 function adjacentIds(id) {
     var adjIds = [];
     try {
@@ -721,32 +731,33 @@ function adjacentIds(id) {
     return adjIds;
 }
 
-function detectWin(){
-    var redTracker = {};
-    for (i=0;i<boardSize;i++){
-        redTracker[`column ${i}`] = 0;
-    }
-    for (i = 0; i < boardSize-1; i++) {
-        redTracker[`row ${i}`] = 0;
-    }
+// Incomplete function in progress, purpose is to detect potential win and block it
+// function detectWin(){
+//     var redTracker = {};
+//     for (i=0;i<boardSize;i++){
+//         redTracker[`column ${i}`] = 0;
+//     }
+//     for (i = 0; i < boardSize-1; i++) {
+//         redTracker[`row ${i}`] = 0;
+//     }
 
-    var sameColCount = 0;
-    var sameRowCount = 0;
-    for (id in redPlayerArray){
-        var split = redPlayerArray[id];
-        var row = split[0];
-        var col = split[1];
-        redTracker[`column ${i}`] += 1;
-        redTracker[`row ${i}`] += 1;
-    }
-    for (const key in redTracker) {
-        if (redTracker.hasOwnProperty(key)) {
-            const element = redTracker[key];
-            if (element==3) {
+//     var sameColCount = 0;
+//     var sameRowCount = 0;
+//     for (id in redPlayerArray){
+//         var split = redPlayerArray[id];
+//         var row = split[0];
+//         var col = split[1];
+//         redTracker[`column ${i}`] += 1;
+//         redTracker[`row ${i}`] += 1;
+//     }
+//     for (const key in redTracker) {
+//         if (redTracker.hasOwnProperty(key)) {
+//             const element = redTracker[key];
+//             if (element==3) {
 
                 
-            }
+//             }
             
-        }
-    }
-}
+//         }
+//     }
+// }
