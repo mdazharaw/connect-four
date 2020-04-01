@@ -443,6 +443,10 @@ function placeDisc(id) {
         redPlayerArray.push((id));
         winner = checkWinner();
     }
+    if(singlePlayer==false && winner==""){
+        alertModal();
+    }
+   
 }
 // Gets the last empty disc slot in a column
 function getLastInColumn(id) {
@@ -646,9 +650,13 @@ function cpuAction() {
 }
 
 // Shows the Next Player, Continue window when a CPU turn is over or a player turn has timed out
-function alertModal() {
+function alertModal(textInput) {
     startTimer = false;
-    var modal = document.getElementById("myModal");
+    var modal = document.getElementById("alertModal");
+    var modalText = document.getElementById("modalText");
+    if (textInput != undefined){
+        modalText.innerText = textInput;
+    }
     var span = document.getElementsByClassName("close")[0];
     modal.style.display = "block";
     span.onclick = function () {
@@ -682,7 +690,7 @@ function dropRandom() {
 // Drops a disc in a random adjacent slot of the last played disc
 function counterMeasure() {
     var redLastPlayed = redPlayerArray[redPlayerArray.length - 1];
-    console.log(redLastPlayed);
+    // console.log(redLastPlayed);
     var adjIds = adjacentIds(redLastPlayed);
     if (adjIds.length != 0) {
         for (id in adjIds) {
