@@ -34,7 +34,16 @@ __What in my code and program design in the project would I do differently next 
 ```
 __What in my code and program design in the project went well? Is there anything I would do the same next time?__
 * Categorisation of functions by usage
-* Design document __*TBC*__
+* Modularity of functions, eg creating multiple sub functions and calling them under a single function, making it easier to manipulate behaviour of function
+```javascript
+
+// Set of actions to be done by CPU during its turn
+function cpuAction() {
+    counterMeasure();
+    alertModal();
+    swapTurn();
+}
+```
 --------------------------------------------------------------------------------------------------
 
 ### WDI Unit 1 Post Mortem
