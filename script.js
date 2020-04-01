@@ -144,9 +144,9 @@ function showFunctions() {
     timerBox.appendChild(timer);
     document.getElementById("functionals").appendChild(timerBox);
 
-    setTimeout(function () {
-        startTimer = true;
-    }, 500);
+    // setTimeout(function () {
+    //     startTimer = true;
+    // }, 500);
 
 }
 
@@ -254,7 +254,9 @@ function drawBoard() {
             boardArray.push(rowArr); // Filling up of board array representation
         }
 
-    } return boardArray;
+    } alertModal("Click on a slot to drop a disc.<br/>Get a straight line of 4 discs to win!<br/><br/>Click anywhere to start playing..."); 
+    return boardArray;
+   
 
 }
 
@@ -655,7 +657,9 @@ function alertModal(textInput) {
     var modal = document.getElementById("alertModal");
     var modalText = document.getElementById("modalText");
     if (textInput != undefined){
-        modalText.innerText = textInput;
+        modalText.innerHTML= textInput;
+    }else{
+        modalText.innerHTML = "Next turn. <br/> Click anywhere to continue...";
     }
     var span = document.getElementsByClassName("close")[0];
     modal.style.display = "block";
